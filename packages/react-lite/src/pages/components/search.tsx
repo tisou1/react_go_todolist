@@ -1,16 +1,11 @@
 
-import React,{ useState, useEffect } from 'react'
+import React,{ useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { add } from '~/store'
 
 function Search() {
     const dispatch = useDispatch()
     const [value, setValue] = useState('')
-
-
-    useEffect(() => {
-  
-    }, [])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       setValue(e.target.value)
