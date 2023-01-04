@@ -7,7 +7,7 @@ export default function c() {
   const todoList: Item[] = useSelector((state: Item[]) => state)
 
   return (
-    <div className='todo-list'>
+    <div className='todo-list py-4 text-indigo'>
       {
         todoList.map(todo => (
           <Todo key={todo.id} todo={todo} />
@@ -49,22 +49,23 @@ function Todo(props: {todo: Item}) {
     <>
       {
         !isEditing ? 
-          <div className='flex justify-center items-center'>
-            <div>
+          <div className='flex justify-between items-center py-2'>
+            <div className=''>
               <span>{text}</span>
               <span>{done}</span>
             </div>
             <div>
-              <button onClick={() => setIsEditing(true)}>编辑</button>
-              <button onClick={handleDelete}>删除</button>
+              <button onClick={() => setIsEditing(true)} className='btn mr-2'>编辑</button>
+              <button onClick={handleDelete} className='btn'>删除</button>
             </div>
           </div>
           : 
-          <div className='flex justify-center items-center'>
+          <div className='flex justify-between items-center py-2'>
             <input
               value={inputValue}
+              className='input h-32px'
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value as string)} />
-            <button onClick={handleSave}>
+            <button onClick={handleSave} className='btn h-32px 1/5 px-3 ml-3'>
               保存
             </button>
           </div>
