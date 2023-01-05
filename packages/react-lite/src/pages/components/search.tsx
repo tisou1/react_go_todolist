@@ -1,6 +1,7 @@
 
 import React,{ useState } from 'react'
 import { useDispatch } from 'react-redux'
+import { nanoid } from '@reduxjs/toolkit'
 import { add } from '~/store'
 
 function Search() {
@@ -13,9 +14,21 @@ function Search() {
   
     const handleClick = () => {
       if(value === '') return
-      dispatch(add({
-        text: value
-      }))
+
+      const param = {
+        text: value,
+        id: nanoid(),
+        done: 0
+      }
+
+      fetch('http://localhost:8080/addTodo', {
+        method: 'post',
+        body: JSON.stringify(param)
+      })
+
+      // dispatch(add({
+      //   text: value
+      // }))
       // 清空输入框
       setValue('')
     }

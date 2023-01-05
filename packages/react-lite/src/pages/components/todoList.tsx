@@ -1,15 +1,26 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { update, deleteTodo } from '~/store'
 import type { Item } from '~/store/type'
+import axios from 'axios'
 
 export default function c() {
   const todoList: Item[] = useSelector((state: Item[]) => state)
+  const [list, setList] = useState<Item[]>([])
+
+  useEffect(() => {
+    fetch('http://localhost:8080/todoList')
+      .then(res => res.json())
+      .then(data => {
+        console.log(data)
+        setList(data.todoList)
+      })
+  }, [])
 
   return (
     <div className='todo-list py-4 text-indigo'>
       {
-        todoList.map(todo => (
+        list.map(todo => (
           <Todo key={todo.id} todo={todo} />
         ))
       }
