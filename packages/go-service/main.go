@@ -93,12 +93,32 @@ func main() {
 
 	r.DELETE("/todoDelete/:id", func(ctx *gin.Context) {
 		id := ctx.Params.ByName("id")
-		fmt.Println(id)
 		sql := "delete from todoList where `id` = ?"
 		// 对sql进行预处理
 		stmt, err := db.Prepare(sql)
 		validErr(err)
 		_, err = stmt.Exec(id)
+		validErr(err)
+
+		// 提交事务
+		tx.Commit()
+		ctx.JSON(http.StatusOK, gin.H{
+			"msg": "success",
+		})
+	})
+
+	r.PUT("/todoUpdate", func(ctx *gin.Context) {
+		var todo Todo
+		// 获取请求参数
+		// body, err := ioutil.ReadAll(c.Request.Body)
+		// validErr(err)
+		// 将body中的参数绑定到struct
+		err = ctx.ShouldBindJSON(&todo)
+		sql := "update todoList set `text` = ?, `done` = ? where `id` = ?"
+		// 对sql进行预处理
+		stmt, err := db.Prepare(sql)
+		validErr(err)
+		_, err = stmt.Exec(todo.Text, todo.Done, todo.Id)
 		validErr(err)
 
 		// 提交事务

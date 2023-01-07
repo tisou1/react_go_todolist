@@ -3,8 +3,10 @@ import React,{ useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { nanoid } from '@reduxjs/toolkit'
 import { add } from '~/store'
+import { addTodo } from '../components/api'
 
-function Search() {
+function Search(props: any) {
+    const { setTodoList } = props
     const dispatch = useDispatch()
     const [value, setValue] = useState('')
 
@@ -12,7 +14,7 @@ function Search() {
       setValue(e.target.value)
     }
   
-    const handleClick = () => {
+    const handleClick = async () => {
       if(value === '') return
 
       const param = {
@@ -21,16 +23,19 @@ function Search() {
         done: 0
       }
 
-      fetch('http://localhost:8080/todoAdd', {
-        method: 'post',
-        body: JSON.stringify(param)
-      })
+      // add
+      const res = await addTodo(param)
+
+      if(res.code) {
+        setTodoList()
+        setValue('')
+      }
+
 
       // dispatch(add({
       //   text: value
       // }))
       // 清空输入框
-      setValue('')
     }
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

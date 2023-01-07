@@ -2,30 +2,18 @@ import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { update, deleteTodo } from '~/store'
 import type { Item } from '~/store/type'
-import axios from 'axios'
+import {updateTodo, deleteToto} from '../components/api'
 
-export default function c() {
+export default function TodoList(props: any) {
+  const { setTodoList, list } = props
+  console.log(list)
   const todoList: Item[] = useSelector((state: Item[]) => state)
-  const [list, setList] = useState<Item[]>([])
-
-
-  const getList = () => {
-    fetch('http://localhost:8080/todoList')
-    .then(res => res.json())
-    .then(data => {
-      setList(data.todoList || [])
-    })
-  }
-
-  useEffect(() => {
-    getList()
-  }, [])
 
   return (
     <div className='todo-list py-4 text-indigo'>
       {
-        list.map(todo => (
-          <Todo key={todo.id} todo={todo} getList={getList}/>
+        list.map(todo  => (
+          <Todo key={todo.id} todo={todo} getList={setTodoList}/>
         ))
       }
     </div>
@@ -35,7 +23,7 @@ export default function c() {
 
 function Todo(props: {todo: Item, getList: () => void}) {
   const { text, done } = props.todo
-  const getList = props.getList
+  const setTodoList = props.getList
   const dispatch = useDispatch()
   const [isEditing, setIsEditing] = useState(false)
   const [inputValue, setInputValue] = useState(text)
@@ -46,27 +34,36 @@ function Todo(props: {todo: Item, getList: () => void}) {
     }))
   }
     
-  const handleSave = () => {
-    handleUpdate({
+  const handleSave = async () => {
+    // handleUpdate({
 
+    //   ...props.todo,
+    //   text: inputValue
+    // })
+
+    // 后端
+
+    const params = {
       ...props.todo,
       text: inputValue
-    })
-    setIsEditing(false)
+    }
+
+    const res = await updateTodo(params)
+    if(res.code) {
+      setTodoList()
+      setIsEditing(false)
+    }
   }
 
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     let id = props.todo.id
     // delete
-    fetch(`http://localhost:8080/todoDelete/${id}`, {
-      method: 'delete',
-    }).then(res => res.json())
-    .then(data => {
-      // 获取新的列表
-      getList()
-    })
 
+    const res = await deleteToto(id as string)
+    if(res.code) {
+      setTodoList()
+    }
     // dispatch(deleteTodo({
     //   id: props.todo.id
     // }))
