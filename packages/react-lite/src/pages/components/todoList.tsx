@@ -8,20 +8,24 @@ export default function c() {
   const todoList: Item[] = useSelector((state: Item[]) => state)
   const [list, setList] = useState<Item[]>([])
 
-  useEffect(() => {
+
+  const getList = () => {
     fetch('http://localhost:8080/todoList')
-      .then(res => res.json())
-      .then(data => {
-        console.log(data)
-        setList(data.todoList)
-      })
+    .then(res => res.json())
+    .then(data => {
+      setList(data.todoList || [])
+    })
+  }
+
+  useEffect(() => {
+    getList()
   }, [])
 
   return (
     <div className='todo-list py-4 text-indigo'>
       {
         list.map(todo => (
-          <Todo key={todo.id} todo={todo} />
+          <Todo key={todo.id} todo={todo} getList={getList}/>
         ))
       }
     </div>
@@ -29,8 +33,9 @@ export default function c() {
 }
 
 
-function Todo(props: {todo: Item}) {
+function Todo(props: {todo: Item, getList: () => void}) {
   const { text, done } = props.todo
+  const getList = props.getList
   const dispatch = useDispatch()
   const [isEditing, setIsEditing] = useState(false)
   const [inputValue, setInputValue] = useState(text)
@@ -52,9 +57,19 @@ function Todo(props: {todo: Item}) {
 
 
   const handleDelete = () => {
-    dispatch(deleteTodo({
-      id: props.todo.id
-    }))
+    let id = props.todo.id
+    // delete
+    fetch(`http://localhost:8080/todoDelete/${id}`, {
+      method: 'delete',
+    }).then(res => res.json())
+    .then(data => {
+      // 获取新的列表
+      getList()
+    })
+
+    // dispatch(deleteTodo({
+    //   id: props.todo.id
+    // }))
   }
   return(
     <>
@@ -62,8 +77,8 @@ function Todo(props: {todo: Item}) {
         !isEditing ? 
           <div className='flex justify-between items-center py-2'>
             <div className=''>
-              <span>{text}</span>
-              <span>{done}</span>
+              <span className='mr-2'>{text}</span>
+              <span>{done ? '完成' : '未完成'}</span>
             </div>
             <div>
               <button onClick={() => setIsEditing(true)} className='btn mr-2'>编辑</button>

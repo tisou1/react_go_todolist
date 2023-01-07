@@ -33,7 +33,7 @@ func main() {
 		})
 	})
 
-	r.POST("/addTodo", func(c *gin.Context) {
+	r.POST("/todoAdd", func(c *gin.Context) {
 		var todo Todo
 		// 获取请求参数
 		// body, err := ioutil.ReadAll(c.Request.Body)
@@ -89,6 +89,23 @@ func main() {
 			"todoList": todos,
 		})
 
+	})
+
+	r.DELETE("/todoDelete/:id", func(ctx *gin.Context) {
+		id := ctx.Params.ByName("id")
+		fmt.Println(id)
+		sql := "delete from todoList where `id` = ?"
+		// 对sql进行预处理
+		stmt, err := db.Prepare(sql)
+		validErr(err)
+		_, err = stmt.Exec(id)
+		validErr(err)
+
+		// 提交事务
+		tx.Commit()
+		ctx.JSON(http.StatusOK, gin.H{
+			"msg": "success",
+		})
 	})
 
 	r.Run() // listen and serve on 0.0.0.0:8080

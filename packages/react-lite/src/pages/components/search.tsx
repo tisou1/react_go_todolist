@@ -21,7 +21,7 @@ function Search() {
         done: 0
       }
 
-      fetch('http://localhost:8080/addTodo', {
+      fetch('http://localhost:8080/todoAdd', {
         method: 'post',
         body: JSON.stringify(param)
       })
