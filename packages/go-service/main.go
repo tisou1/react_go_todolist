@@ -1,7 +1,9 @@
 package main
 
 import (
-	"database/sql"
+	"Gone/db"
+	todolist "Gone/todoList"
+	"Gone/utils"
 	"fmt"
 	"net/http"
 
@@ -16,7 +18,8 @@ type Todo struct {
 }
 
 func main() {
-	db := dbConnect()
+	todolist.TodoAdd()
+	db := db.DBConnect()
 	// 开启事务
 	tx, err := db.Begin()
 
@@ -24,6 +27,8 @@ func main() {
 
 	r.Use(Cors())
 	// 校验
+
+	validErr := utils.ValidErr
 	validErr(err)
 
 	r.GET("/hello", func(c *gin.Context) {
@@ -129,28 +134,6 @@ func main() {
 	})
 
 	r.Run() // listen and serve on 0.0.0.0:8080
-}
-
-func dbConnect() *sql.DB {
-	DB, _ := sql.Open("mysql", "root:siry@tcp(192.168.31.251:3306)/todo_db")
-	// 设置最大连接数
-	DB.SetConnMaxLifetime(100)
-	// 设置上数据库最大闲置连接数
-	DB.SetMaxIdleConns(10)
-
-	if err := DB.Ping(); err != nil {
-		fmt.Println("open database fail")
-		panic(err)
-	}
-	fmt.Println("connect success")
-
-	return DB
-}
-
-func validErr(err error) {
-	if err != nil {
-		panic((err))
-	}
 }
 
 // cors
